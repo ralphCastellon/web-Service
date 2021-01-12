@@ -2,18 +2,21 @@
 	include "connection.php";
 	global $conn;
 	header("Content-Type:application/json");
-	//echo "no hay get";
-	if (isset($_GET["ciudad"])):
+	if (isset($_GET["ciudad"]) && isset($_GET["mes"])):
 		try {
 			$nombre = $_GET["ciudad"];
-			$query = "select * from precipitaciones where NOMBRE = '$nombre'";
-			$result = $conn->query($query);
-			$response;
-			$row = $result->fetch_assoc();
-				$response = "Nombre: " . $row["NOMBRE"]. " Enero: ". $row["ENE"]. " Febrero: " . $row["FEB"]." Marzo: " . $row["MAR"]. " Abril: " . $row["ABR"].
-				" Mayo: " . $row["MAY"]. " Junio: " . $row["JUN"]. " Julio: " . $row["JUL"]. " Agosto: " . $row["AGO"]. " Septiembre: " . $row["SEP"]. " Octubre: " . $row["OCT"].
-				" Noviembre: " . $row["NOV"]. " Diciembre: " . $row["DIC"];
-			 deliver_response(200, "Ciudad encotrada", $response);
+			$mes = $_GET["mes"];
+			$query = "select NOMBRE, ? from precipitaciones where NOMBRE = '$nombre'";
+			$stm = $conn->prepare($query);
+			$stm->bind_param("s",$mes);
+			$stm->execute();
+			$result = $stm->get_result();;
+			$stm->close();
+			$response = array();
+			while($row = $result->fetch_array()):
+				array_push($response, "Nombre: " . $row[0]. " Mes '$mes': ". $row[1]);
+			endwhile;
+			deliver_response(200, "Mes y ciudad encotrados", $response);
 		} catch (mysqli_sql_exception $e) {
 			echo $e->getMessage();
 		} finally {

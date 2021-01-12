@@ -2,18 +2,15 @@
 	include "connection.php";
 	global $conn;
 	header("Content-Type:application/json");
-	//echo "no hay get";
-	if (isset($_GET["ciudad"])):
+	if (isset($_GET["media"])):
 		try {
-			$nombre = $_GET["ciudad"];
-			$query = "select * from precipitaciones where NOMBRE = '$nombre'";
+			$query = "select NOMBRE, MEDIA from precipitaciones";
 			$result = $conn->query($query);
-			$response;
-			$row = $result->fetch_assoc();
-				$response = "Nombre: " . $row["NOMBRE"]. " Enero: ". $row["ENE"]. " Febrero: " . $row["FEB"]." Marzo: " . $row["MAR"]. " Abril: " . $row["ABR"].
-				" Mayo: " . $row["MAY"]. " Junio: " . $row["JUN"]. " Julio: " . $row["JUL"]. " Agosto: " . $row["AGO"]. " Septiembre: " . $row["SEP"]. " Octubre: " . $row["OCT"].
-				" Noviembre: " . $row["NOV"]. " Diciembre: " . $row["DIC"];
-			 deliver_response(200, "Ciudad encotrada", $response);
+			$response = array();
+			while($row = $result->fetch_assoc()):
+				array_push($response, "Nombre: " . $row["NOMBRE"]. " Media: ". $row["MEDIA"]);
+			endwhile;
+			deliver_response(200, "Media encotrada", $response);
 		} catch (mysqli_sql_exception $e) {
 			echo $e->getMessage();
 		} finally {
@@ -30,3 +27,5 @@
         $json_response = json_encode($response);
         echo $json_response;
     }
+	
+	

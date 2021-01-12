@@ -3,17 +3,16 @@
 	global $conn;
 	header("Content-Type:application/json");
 	//echo "no hay get";
-	if (isset($_GET["ciudad"])):
+	if (isset($_GET["anual"])):
 		try {
-			$nombre = $_GET["ciudad"];
-			$query = "select * from precipitaciones where NOMBRE = '$nombre'";
+			$anual = $_GET["anual"];
+			$query = "select NOMBRE, ANUAL from precipitaciones";
 			$result = $conn->query($query);
-			$response;
-			$row = $result->fetch_assoc();
-				$response = "Nombre: " . $row["NOMBRE"]. " Enero: ". $row["ENE"]. " Febrero: " . $row["FEB"]." Marzo: " . $row["MAR"]. " Abril: " . $row["ABR"].
-				" Mayo: " . $row["MAY"]. " Junio: " . $row["JUN"]. " Julio: " . $row["JUL"]. " Agosto: " . $row["AGO"]. " Septiembre: " . $row["SEP"]. " Octubre: " . $row["OCT"].
-				" Noviembre: " . $row["NOV"]. " Diciembre: " . $row["DIC"];
-			 deliver_response(200, "Ciudad encotrada", $response);
+			$response = array();
+			while($row = $result->fetch_array()):
+				array_push($response, "Nombre: " . $row[0]. " ANUAL: ". $row[1]);
+			endwhile;
+			deliver_response(200, "Anual encotrada", $response);
 		} catch (mysqli_sql_exception $e) {
 			echo $e->getMessage();
 		} finally {

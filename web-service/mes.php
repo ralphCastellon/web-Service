@@ -5,11 +5,15 @@
 	if (isset($_GET["mes"])):
 		try {
 			$mes = $_GET["mes"];
-			$query = "select NOMBRE, '$mes' from precipitaciones";
-			$result = $conn->query($query);
-			$response;
-			while($row = $result->fetch_assoc()):
-				$response += "Nombre: " . $row[0]. " Mes: ". $row[1];
+			$query = "select NOMBRE, ? from precipitaciones";
+			$stm = $conn->prepare($query);
+			$stm->bind_param("s",$mes);
+			$stm->execute();
+			$result = $stm->get_result();;
+			$stm->close();
+			$response = array();
+			while($row = $result->fetch_array()):
+				array_push($response, "Nombre: " . $row[0]. " Mes: ". $row[1]);
 			endwhile;
 			deliver_response(200, "Mes encotrada", $response);
 		} catch (mysqli_sql_exception $e) {
